@@ -77,7 +77,7 @@ class Product(models.Model):
     type_id = models.ForeignKey(Producttype)
     brand_id = models.ForeignKey(Brand)
     name = models.CharField(max_length=50)
-    weight = models.FloatField(max_digits=5, decimal_places=2)
+    weight = models.FloatField()
     is_new = models.BooleanField(default=True)
     is_hot = models.BooleanField(default=True)
     is_commend = models.BooleanField(default=False)
@@ -134,7 +134,7 @@ class Sku(models.Model):
     color_id = models.ForeignKey(Color)
     sizes = models.CharField(max_length=5)
     delive_fee = models.IntegerField(default=10)
-    price = models.FloatField(max_digits=5, decimal_places=2)
+    price = models.FloatField()
     stock = models.IntegerField()
     location = models.CharField(max_length=50)
 
@@ -146,23 +146,6 @@ class Sku(models.Model):
 
     def __unicode__(self):
         return self.product_id.name
-
-
-class Orderdetail(models.Model):
-    '''
-    订单详情表(具体的订单参数)，购物车需要
-    订单ID,商品编号,商品名称,颜色名称,尺码,商品销售价,购买数量
-    '''
-    order_id = models.ForeignKey(Order)
-    product_id = models.IntegerField()
-    product_name = models.CharField(max_length=80)
-    color = models.CharField(max_length=5)
-    size = models.CharField(max_length=5)
-    price = models.FloatField(max_digits=5, decimal_places=2)
-    amount = models.IntegerField(default=1)
-
-    def __unicode__(self):
-        return self.product_name
 
 
 class Order(models.Model):
@@ -183,8 +166,8 @@ class Order(models.Model):
     '''
     order_id = models.IntegerField(primary_key=True)
     deliver_fee = models.IntegerField()
-    total_fee = models.FloatField(max_digits=5, decimal_places=2)
-    order_price = models.FloatField(max_digits=5, decimal_places=2)
+    total_fee = models.FloatField()
+    order_price = models.FloatField()
     payment_way = models.CharField(max_length=10)
     payment_cash = models.CharField(max_length=10)
     delivery = models.DateField(auto_now_add=True)
@@ -197,3 +180,20 @@ class Order(models.Model):
 
     def __unicode__(self):
         return self.buyer_id.user.username
+
+
+class Orderdetail(models.Model):
+    '''
+    订单详情表(具体的订单参数)，购物车需要
+    订单ID,商品编号,商品名称,颜色名称,尺码,商品销售价,购买数量
+    '''
+    order_id = models.ForeignKey(Order)
+    product_id = models.IntegerField()
+    product_name = models.CharField(max_length=80)
+    color = models.CharField(max_length=5)
+    size = models.CharField(max_length=5)
+    price = models.FloatField()
+    amount = models.IntegerField(default=1)
+
+    def __unicode__(self):
+        return self.product_name
