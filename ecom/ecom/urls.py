@@ -9,3 +9,11 @@ urlpatterns = patterns('',
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^eweb/', include('eweb.urls')),
                        )
+from django.conf import settings
+if settings.DEBUG:
+    urlpatterns += patterns(
+        'django.views.static',
+        (r'^res/(?P<path>.*)',
+         'serve',
+         {'document_root': settings.MEDIA_ROOT}),
+    )

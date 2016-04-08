@@ -64,7 +64,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'mysql',
         'HOST': 'localhost',
-        'PORT':'3306',
+        'PORT': '3306',
     }
 }
 
@@ -86,3 +86,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+TEMPLATE_DIRS = [
+    TEMPLATE_PATH,
+]
+
+STATIC_PATH = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (
+    STATIC_PATH,
+)
+
+MEDIA_URL = '/uploadimages/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
