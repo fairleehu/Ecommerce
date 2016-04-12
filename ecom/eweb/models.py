@@ -15,7 +15,7 @@ class Buyer(models.Model):
     user = models.OneToOneField(User)
     gender = models.CharField(
         u'性别', choices=TITLE_CHOICES, max_length=10, null=True, blank=True)
-    register_time = models.DateTimeField(auto_now_add=True,)
+    register_time = models.DateTimeField(auto_now_add=True)
     real_name = models.CharField(max_length=20, blank=True)
     province = models.CharField(max_length=20, blank=True)
     city = models.CharField(max_length=20, blank=True)
