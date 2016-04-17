@@ -51,6 +51,7 @@ def cart(request):
     """
     return render(request, 'eweb/cart.html')
 
+
 @csrf_exempt
 def order(request):
     """
