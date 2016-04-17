@@ -62,7 +62,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ecom',
         'USER': 'root',
-        'PASSWORD': '196619',
+        'PASSWORD': 'mysql',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -97,5 +97,5 @@ STATICFILES_DIRS = (
     STATIC_PATH,
 )
 
-MEDIA_URL = '/uploadimages/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/res/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'res')

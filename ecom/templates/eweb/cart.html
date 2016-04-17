@@ -1,1 +1,139 @@
 {% extends "homepage.html" %}
+{% block body%}
+<div class="container">
+        <!-- 内容部分开始 -->
+
+
+
+        <!-- 购物车开始 -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="cart-title f16 tit-family pl10 mt10">我的购物车</div>
+                <div class="cart-content">
+                    <table width="100%" border="0">
+                        <tbody>
+                            <tr>
+                                <td width="5%" class="tr-title">
+                                    <form>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" />全选</label>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td width="45%" class="tr-title">商品名称</td>
+                                <td width="21%" class="tr-title">金额</td>
+                                <td width="21%" class="tr-title">数量</td>
+                                <td width="8%" class="tr-title">操作</td>
+                            </tr>
+
+                            <tr>
+                                <td width="5%" class="tr-list">
+                                    <form>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" /></label>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td width="45%" class="tr-list">
+                                    <a href="">
+                                        <img class="pull-left" alt="" src="" /></a>
+                                    <div class="summary blue-font"><a href=""></a></div>
+                                </td>
+                                <td width="21%" class="tr-list"><b class="orange-font">￥ </b></td>
+                                <td width="21%" class="tr-list">
+                                    <span class="ui-spinner">
+                                        <input type="text" value="0" aria-valuenow="0" autocomplete="off">
+                                        <a class="ui-spinner-button ui-spinner-up" tabindex="-1"><span class="ui-icon">▲</span></a>
+                                        <a class="ui-spinner-button ui-spinner-down" tabindex="-1"><span class="ui-icon">▼</span></a>
+                                    </span>
+                                </td>
+                                <td width="8%" class="tr-list bule-font"><a href="">删除</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-12 main-show mb10">
+                <div class="p10">
+                    <div class="show-left pull-left">
+                        <a href=""><i class="icon-main icon-fork"></i>删除选中的商品</a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="total tr"><b>总计（不含运费）：</b> <i class="orange-font f20 tit-family pr10">总价格显示区域</i></div>
+            </div>
+            <div class="pull-right">
+                <button type="button" class="btn btn-addcart btn-lg mr20">继续购物</button>
+                <button type="button" class="btn btn-danger btn-lg mr20">去结算</button>
+            </div>
+        </div>
+        <!-- 购物车结束 -->
+        <!-- 购物车为空 -->
+        <!--<div class="row">
+            <div class="col-lg-12">
+                <div class="cart-title f16 tit-family pl10 mt10">我的购物车</div>
+                <div class="cart-content p30">
+                    <div class="pull-left empty-img"><img alt="" src="" /></div>
+                    <div class="pull-right empty-text tit-family">
+                        您的购物车中还没有商品，您现在可以<br />
+                        <b class="f14">马上去 <i><a href="/eweb/">挑选商品</a></i></b>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>-->
+        <!-- 购物车为空 -->
+        <div class="row mt10">
+            <div class="col-lg-12 help-center">
+                <ul class="help-list">
+                    <li>
+                        <ul class="help-on">
+                            <li class="ontitle"><i class="icon-main icon-help-1 pull-left"></i>关于我们</li>
+                            <li class="ontext"><a href="#">关于xx运动网</a></li>
+                            <li class="ontext"><a href="#">联系我们</a></li>
+                            <li class="ontext"><a href="#">加入我们</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="help-on">
+                            <li class="ontitle"><i class="icon-main icon-help-2 pull-left"></i>购物指南</li>
+                            <li class="ontext"><a href="#">购物流程</a></li>
+                            <li class="ontext"><a href="#">服务协议</a></li>
+                            <li class="ontext"><a href="#">优惠券说明</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="help-on">
+                            <li class="ontitle"><i class="icon-main icon-help-3 pull-left"></i>支付方式</li>
+                            <li class="ontext"><a href="#">银联支付</a></li>
+                            <li class="ontext"><a href="#">快钱支付</a></li>
+                            <li class="ontext"><a href="#">支付宝支付</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="help-on">
+                            <li class="ontitle"><i class="icon-main icon-help-4 pull-left"></i>配送方式</li>
+                            <li class="ontext"><a href="#">运费说明</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="help-on">
+                            <li class="ontitle"><i class="icon-main icon-help-5 pull-left"></i>售后服务</li>
+                            <li class="ontext"><a href="#">退换货政策</a></li>
+                            <li class="ontext"><a href="#">退换货流程</a></li>
+                            <li class="ontext"><a href="#">退换货申请</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="help-on">
+                            <li class="ontitle"><i class="icon-main icon-help-6 pull-left"></i>帮助信息</li>
+                            <li class="ontext"><a href="#">常见问题</a></li>
+                            <li class="ontext"><a href="#">投诉建议</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+{% endblock%}
