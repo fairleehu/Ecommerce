@@ -6,6 +6,7 @@
     <title></title>
     <link href="{% static 'lib/bootstrap/css/bootstrap.css' %}" rel="stylesheet" />
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    {% block script%} {% endblock%}
 </head>
 <body>
 <!--sitebar begin-->
@@ -21,7 +22,7 @@
                 </div>
                 <div class="col-lg-6">
                     <ul class="pull-right bar-link">
-                        <li><a href="#">我的订单</a> | </li>
+                        <li><a href="/eweb/personal">个人中心</a> | </li>
                         <li><a href="#">客服服务</a> | </li>
                         <li><a href="#">联系客服</a> |&nbsp;&nbsp;&nbsp;&nbsp;</li>
                         <!--<li class="tel-num"><i class="icon-main icon-tel mt8 mr5"></i>8888-888-888</li>-->
@@ -40,14 +41,14 @@
                 </div>
                 <div class="col-lg-5">
                     <form action="" method="get">
-                        <label for="txt_search" class="hidden">搜索传智 分类/品牌/商品</label>
+                        <label for="txt_search" class="hidden">搜索 分类/品牌/商品</label>
                         <input id="txt_search" type="text" name="q" accesskey="s" autocomplete="off" autofocus="true" x-webkit-speech="" x-webkit-grammar="builtin:translate" class="s-combobox-input" role="combobox" aria-haspopup="true" title="请输入搜索文字" aria-label="请输入搜索文字">
                         <button id="btn_search" type="submit">搜索</button>
                     </form>
                 </div>
                 <div class="col-lg-3">
                     <div id="mini_cart" class="btn-group mt30 ml15">
-                        <a href="/cart/" class="btn btn-radius-none btn-default dropdown-toggle f12" data-toggle="dropdown">
+                        <a href="/eweb/cart/" class="btn btn-radius-none btn-default dropdown-toggle f12" data-toggle="dropdown">
                             <i class="icon-main icon-cart ilb"></i>我的购物车 <span class="caret"></span>
                         </a>
                         <!--购物车为空-->
@@ -63,7 +64,7 @@
                                         <li>
                                             <div class="pull-left product-info">
                                                 <img class="pull-left" alt="" src="" />
-                                                <div class="summary"><a href="">【五折】自然素材 蜜桃芒果味果冻 255g 台湾地区进口</a></div>
+                                                <div class="summary"><a href="">  </a></div>
                                             </div>
                                             <div class="pull-right price-info">
                                                 <b class="red-font">￥779.00</b>×1<br>

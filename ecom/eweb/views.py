@@ -37,7 +37,7 @@ def register(request):
 
 
 @csrf_exempt
-def goodsinfo(request):
+def goodsinfo(request, product_id):
     """
     进入商品详情页面(继承homepage页面)
     """
@@ -59,3 +59,31 @@ def order(request):
     直接点击支付按钮进入填写订单，确定支付
     """
     return render(request, 'eweb/cart.html')
+
+
+def personal(request):
+    '''
+    个人中心页面
+    '''
+    return render(request, 'eweb/personal.html')
+
+
+def cartstep(request):
+    '''
+    购物付款流程
+    '''
+    return render(request, 'eweb/cartstep1.html')
+
+
+def cartstep2(request):
+    '''
+    购物付款流程2
+    '''
+    return render(request, 'eweb/cartstep2.html')
+
+
+def cartstep3(request):
+    '''
+    购物付款流程3
+    '''
+    return render(request, 'eweb/cartstep3.html')

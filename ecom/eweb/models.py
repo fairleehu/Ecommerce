@@ -12,6 +12,8 @@ class Buyer(models.Model):
     商城购买者
     用户,性别,注册时间,真实名字,省ID,市ID,县ID,地址,
     '''
+    buyer_id = models.AutoField(primary_key=True)
+
     user = models.OneToOneField(User,verbose_name="用户名")
     gender = models.CharField(
         u'性别', choices=TITLE_CHOICES, max_length=10, null=True, blank=True)
@@ -30,6 +32,8 @@ class Brand(models.Model):
     商品品牌
     名称,描述,图片Url(存在static目录下),是否可见'1:可见 0:不可见'
     '''
+    brand_id = models.AutoField(primary_key=True)
+
     name = models.CharField(max_length=20,verbose_name='商品名称')
     description = models.CharField(max_length=80,verbose_name='描述')
     img_url = models.CharField(max_length=80,verbose_name='图片url')
@@ -44,8 +48,10 @@ class Producttype(models.Model):
     商品类型
     名称,父商品类型id,备注(用于搜索页面商品描述),是否可见 1:可见 0:不可见
     '''
+    product_type_id = models.AutoField(primary_key=True)
+
     name = models.CharField(max_length=20,verbose_name='用户名')
-    parent_id = models.IntegerField(verbose_name='父商品类型id')
+    parent_id = models.IntegerField(verbose_name='父商品类型id', null=True)
     note = models.CharField(max_length=50,verbose_name='备注')
     is_display = models.BooleanField(default=True,verbose_name='是否可见')
 
@@ -58,6 +64,8 @@ class Productfeature(models.Model):
     商品属性
     名称,是否废弃:1:未废弃,0:废弃了
     '''
+    product_feature_id = models.AutoField(primary_key=True)
+
     name = models.CharField(max_length=20,verbose_name='商品属性')
     is_del = models.BooleanField(default=True,verbose_name='是否废弃')
 
@@ -72,9 +80,9 @@ class Product(models.Model):
     是否热销(0,否 1:是),推荐(1推荐 0 不推荐),上下架(0否 1是),是否删除(0删除,1没删除),销量,商品描述(需要图片描述的路径),
     包装清单,商品属性集,颜色集,尺寸集,添加时间
     '''
-    pid = models.IntegerField(primary_key=True,verbose_name='ID或商品编号')
-    type_id = models.ForeignKey(Producttype,verbose_name='类型ID')
-    brand_id = models.ForeignKey(Brand,verbose_name='品牌ID')
+    product_id = models.IntegerField(primary_key=True,verbose_name='ID或商品编号')
+    producttype = models.ForeignKey(Producttype,verbose_name='类型ID')
+    brand = models.ForeignKey(Brand,verbose_name='品牌ID')
     name = models.CharField(max_length=50,verbose_name='商品名称')
     weight = models.FloatField(verbose_name='重量（克）')
     is_new = models.BooleanField(default=True,verbose_name='是否新品')
@@ -101,12 +109,12 @@ class Img(models.Model):
     商品ID,图片url
     是否默认 0否 1是
     '''
-    product_id = models.ForeignKey(Product,verbose_name='商品ID')
+    product = models.ForeignKey(Product,verbose_name='商品')
     url = models.ImageField(upload_to='productimages', blank=False,verbose_name='图片Url')
     is_def = models.BooleanField(default=False,verbose_name='是否默认')
 
     def __unicode__(self):
-        return self.product_id.name
+        return self.product.name
 
 
 class Color(models.Model):
@@ -114,8 +122,10 @@ class Color(models.Model):
     商品颜色
     颜色,颜色父ID
     '''
+    color_id = models.AutoField(primary_key=True)
+
     color = models.CharField(max_length=20,verbose_name='商品颜色')
-    parent_id = models.IntegerField(verbose_name='颜色父ID')
+    parent_id = models.IntegerField(verbose_name='颜色父ID', null=True)
 
     def __unicode__(self):
         return self.color
@@ -129,8 +139,10 @@ class Sku(models.Model):
     0:赠品,1普通
     销量
     '''
-    product_id = models.ForeignKey(Product,verbose_name='商品ID')
-    color_id = models.ForeignKey(Color,verbose_name='颜色ID')
+    sku_id = models.AutoField(primary_key=True)
+
+    product = models.ForeignKey(Product,verbose_name='商品')
+    color = models.ForeignKey(Color,verbose_name='颜色')
     sizes = models.CharField(max_length=5,verbose_name='尺码')
     delive_fee = models.IntegerField(default=10,verbose_name='运费')
     price = models.FloatField(verbose_name='售价')
@@ -141,10 +153,10 @@ class Sku(models.Model):
 
     sku_status = models.BooleanField(default=False)
     sku_type = models.BooleanField(default=True)
-    sales = models.IntegerField(verbose_name='销量')
+    sales = models.IntegerField(default=0, verbose_name='销量')
 
     def __unicode__(self):
-        return self.product_id.name
+        return self.product.name
 
 
 class Order(models.Model):
@@ -164,6 +176,7 @@ class Order(models.Model):
     '用户名',
     '''
     order_id = models.IntegerField(primary_key=True,verbose_name='订单ID')
+
     deliver_fee = models.IntegerField(verbose_name='运费')
     total_fee = models.FloatField(verbose_name='应付金额')
     order_price = models.FloatField(verbose_name='订单金额')
@@ -174,11 +187,11 @@ class Order(models.Model):
     is_pay = models.CharField(max_length=10,verbose_name='支付状态')
     order_state = models.CharField(max_length=10,verbose_name='订单状态')
     create_date = models.DateTimeField(auto_now_add=True,verbose_name='订单生成时间')
-    note = models.CharField(max_length=100,verbose_name='附言')
-    buyer_id = models.ForeignKey(Buyer,verbose_name='用户名')
+    note = models.CharField(max_length=100,verbose_name='附言', null=True)
+    buyer = models.ForeignKey(Buyer,verbose_name='用户名')
 
     def __unicode__(self):
-        return self.buyer_id.user.username
+        return self.buyer.user.username
 
 
 class Orderdetail(models.Model):
@@ -186,7 +199,9 @@ class Orderdetail(models.Model):
     订单详情表(具体的订单参数)，购物车需要
     订单ID,商品编号,商品名称,颜色名称,尺码,商品销售价,购买数量
     '''
-    order_id = models.ForeignKey(Order,verbose_name='订单ID')
+    order_detail_id = models.AutoField(primary_key=True)
+
+    order = models.ForeignKey(Order,verbose_name='订单')
     product_id = models.IntegerField(verbose_name='商品编号')
     product_name = models.CharField(max_length=80,verbose_name='商品名称')
     color = models.CharField(max_length=5,verbose_name='颜色名称')

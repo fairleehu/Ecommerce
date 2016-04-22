@@ -174,7 +174,7 @@ input, button, select, textarea { outline: none; }
 .hover-toggle:hover .dropdown-box { display: block !important; }
 
 /*图片定位*/
-.icon-main { background-image: url(../img/style-icon-all.png); background-repeat: no-repeat; display: inline-block; vertical-align: middle; }
+.icon-main { background-image: url(../images/logo/style-icon-all.png); background-repeat: no-repeat; display: inline-block; vertical-align: middle; }
 .icon-collect { background-position: 0 0; width: 15px; height: 15px; -moz-transition: transform .4s ease-in 0s; -ms-transition: transform .4s ease-in 0s; -o-transition: transform .4s ease-in 0s; -webkit-transition: -webkit-transform .2s ease-in 0s; transition: transform .4s ease-in 0s; float: left; }
 .icon-tel { background-position: -23px 0; width: 15px; height: 15px; float: left; }
 
@@ -552,7 +552,7 @@ input, button, select, textarea { outline: none; }
 .icon-step-4 { background-position: 0 -225px; width: 980px; height: 75px; }
 
 /*购物车*/
-.cart-step { background-image: url(../images/logo/cart-step.gif); }
+.cart-step { background-image: url(../images/logo/cart-step.png); }
 .cart-icon-1 { background-position: 0 0; width: 364px; height: 100px; }
 .cart-icon-2 { background-position: 0 -100px; width: 364px; height: 100px; }
 .cart-icon-3 { background-position: 0 -200px; width: 364px; height: 100px; }
