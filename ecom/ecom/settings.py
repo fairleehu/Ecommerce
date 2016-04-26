@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Django settings for ecom project.
 
@@ -37,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'eweb',
+    'databaselib',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,6 +55,13 @@ ROOT_URLCONF = 'ecom.urls'
 
 WSGI_APPLICATION = 'ecom.wsgi.application'
 
+#设置session,将临时session保存到cookies中
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
+#设置服务器session的缓存区
+SERVER_SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+SESSION_CACHE_ALIAS = 'default'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -68,6 +77,17 @@ DATABASES = {
     }
 }
 
+#Cache
+#用单个节点来保存session缓存
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/0',
+        'OPTIONS': {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

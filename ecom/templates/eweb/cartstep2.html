@@ -9,7 +9,7 @@
                     <i class="cart-step cart-icon-1 ilb"></i>
             </div>
             </div>
-            
+
             <div class="row-p30">
             <div class="col-lg-1"></div>
 
@@ -54,18 +54,19 @@
                                 <td width="21%" class="tr-title">金额</td>
                                 <td width="21%" class="tr-title">数量</td>
                             </tr>
-
+                            {% for item in Contents %}
                             <tr>
                                 <td width="50%" class="tr-list">
-                                    <a href="">
-                                        <img class="pull-left" alt="" src="" /></a>
-                                    <div class="summary blue-font"><a href=""></a></div>
+                                    <a href="../good/{{item.ProductID}}" target="_blank">
+                                        <img class="pull-left" alt= {{item.Name}} src= {{item.Image}} /></a>
+                                    <div class="summary blue-font"><a href="../good/{{item.ProductID}}" target="_blank">{{item.Name}}</a></div>
                                 </td>
-                                <td width="25%" class="tr-list"><b class="orange-font">￥ </b></td>
+                                <td width="25%" class="tr-list"><b class="orange-font">￥{{item.Cost}} </b></td>
                                 <td width="25%" class="tr-list">
-                                    <a>数量</a>
+                                    <a>{{item.Count}}</a>
                                 </td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -77,10 +78,13 @@
         <div class="row p30">
         <div class="col-lg-1"></div>
             <div class="col-lg-10 main-show mb10">
-                <div class="total tr"><b>总计（不含运费）：</b> <i class="orange-font f20 tit-family pr10">总价格显示区域</i></div>
+                <div class="total tr"><b>总计（不含运费）：</b> <i class="orange-font f20 tit-family pr10">{{Total}}</i></div>
             </div>
             <div class="pull-right">
-                <button onclick="window.location.href='/eweb/cartstep3'" type="button" class="btn btn-danger btn-lg mr20">提交订单</button>
+              <form id="submit_order" method="post" action="/eweb/cartstep2/">
+                {% csrf_token %}
+                <input value="提交订单" type="submit" class="btn btn-danger btn-lg mr20"/>
+              <form>
             </div>
             </div>
 
