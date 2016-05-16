@@ -4,12 +4,14 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title></title>
-    <link href="{% static 'lib/bootstrap/css/bootstrap.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" />
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
     <script type="text/javascript" src="{% static 'js/jquery-2.0.3.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/jquery-1.7.1.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/eweb.js' %}"></script>
-    {% block script%}    {% endblock%}
+    <script type="text/javascript" src="{% static 'js/home.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/filter-ajax.js' %}"></script>
+    <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/goods.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
 </head>
 <body>
 <!--sitebar begin-->
@@ -19,8 +21,8 @@
                 <div class="col-lg-6">
                     <span>您好，欢迎您光临xx运动网！请</span>
                     <span class="bar-link">
-                        <a href="#">登录</a>
-                        <a href="#">注册</a>
+                        <a href="/eweb/login/">登录</a>
+                        <a href="/eweb/register/">注册</a>
                     </span>
                 </div>
                 <div class="col-lg-6">
@@ -39,8 +41,8 @@
         <div class="container">
             <div class="row search">
                 <div class="col-lg-4">
-                    <h1 class="logo"><a href="">
-                        <img src="" alt="" /></a><img src="" alt="xx运动网图片" /></h1>
+                    <h1 class="logo"><a href="/eweb/">
+                        <img src="" alt="xx运动网图片" /></a></h1>
                 </div>
                 <div class="col-lg-5">
                     <form action="" method="get">
@@ -51,13 +53,14 @@
                 </div>
                 <div class="col-lg-3">
                     <div id="mini_cart" class="btn-group mt30 ml15">
-                        <a href="/cart/" class="btn btn-radius-none btn-default dropdown-toggle f12" data-toggle="dropdown">
+                        <a href="/eweb/cart/">
                             <i class="icon-main icon-cart ilb"></i>我的购物车 <span class="caret"></span>
                         </a>
                         <!--购物车为空-->
+                        <!--
                         <ul class="dropdown-box" role="menu">
                             <li><i class="icon-main icon-mini-cart ilb"></i>购物车中还没有商品，赶紧选购吧！</li>
-                        </ul>
+                        </ul>-->
                         <!--购物车有商品-->
                         <!--<ul class="dropdown-box" role="menu">
                             <li>
@@ -67,7 +70,7 @@
                                         <li>
                                             <div class="pull-left product-info">
                                                 <img class="pull-left" alt="" src="" />
-                                                <div class="summary"><a href="">【五折】自然素材 蜜桃芒果味果冻 255g 台湾地区进口</a></div>
+                                                <div class="summary"><a href=""></a></div>
                                             </div>
                                             <div class="pull-right price-info">
                                                 <b class="red-font">￥779.00</b>×1<br>
@@ -97,33 +100,17 @@
         <div class="widget mb10">
                     <h5 class="widget-tit pl10 fb">销量推荐</h5>
                     <ul class="widget-list-2">
-                        <li>
-                            <div class="w-list-product pr">
-                                <a href=""><i class="icon-main icon-red-rank ild pa">1</i><img class="pull-left" alt="" src="" /></a>
-                                <div class="summary"><a href="">{{product_commend.name}}</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
+                    {% if commend_list %}
+                    {% for one in commend_list %}
+                    <li>
+                           <div class="w-list-product pr">
+                                <a href=""><i class="icon-main icon-red-rank ild pa">1</i><img class="pull-left" alt="img" src="/res/{{ one.img }}"/></a>
+                                <div class="summary"><a href="/eweb/good/{{ one.id }}/">{{ one.name }}</a></div>
+                                <div class="price"><b>{{ one.price }}</b></div>
                             </div>
-                        </li>
-                        <li>
-                            <div class="w-list-product pr">
-                                <a href=""><i class="icon-main icon-red-rank ild pa">2</i><img class="pull-left" alt="" src="" /></a>
-                                <div class="summary"><a href="">{{product_commend.name}}</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="w-list-product pr">
-                                <a href=""><i class="icon-main icon-red-rank ild pa">3</i><img class="pull-left" alt="" src="" /></a>
-                                <div class="summary"><a href="">{{product_commend.name}}</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="w-list-product pr">
-                                <a href=""><i class="icon-main icon-gray-rank ild pa">4</i><img class="pull-left" alt="" src="" /></a>
-                                <div class="summary"><a href="">{{product_commend.name}}</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
-                            </div>
+                    </li>
+                    {% endfor %}
+                    {% endif %}
                         </li>
                     </ul>
                 </div>
@@ -138,34 +125,17 @@
                     <div class="list-item-title pl10 f14 tit-family "><i class="icon-main icon-recom mr5"></i>热卖排行</div>
                     <div class="recommend-list">
                         <ul>
-                            <li>
-                                <a href="">
-                                    <img alt="" class="pull-left center-block" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
-                                <button type="button" class="btn btn-danger btn-xs">立即抢购</button>
+                        {% if hot_list %}
+                        {% for one in hot_list %}
+                        <li>
+                         <a href="">
+                            <img alt="img" class="pull-left center-block" src="/res/{{ one.img }}"></a>
+                            <div class="summary"><a href="/eweb/good/{{ one.id }}/">{{one.name}}</a></div>
+                            <div class="price"><b>{{one.price}}</b></div>
+                            <button type="button" class="btn btn-danger btn-xs">立即抢购</button>
                             </li>
-                            <li>
-                                <a href="">
-                                    <img alt="" class="pull-left center-block" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
-                                <button type="button" class="btn btn-danger btn-xs">立即抢购</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img alt="" class="pull-left center-block" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
-                                <button type="button" class="btn btn-danger btn-xs">立即抢购</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img alt="" class="pull-left center-block" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>显示商品价格</b></div>
-                                <button type="button" class="btn btn-danger btn-xs">立即抢购</button>
-                            </li>
+                        {% endfor %}
+                        {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -187,39 +157,57 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="list-body select1" >
-                            <div class="pull-left filter-left">品牌种类：</div>
+                            <div class="pull-left filter-left">品   牌：</div>
                             <div class="pull-right filter-right">
-                                <ul id="select1">
+                              <ul id="select1">
+                            <li class="select-all selected-1"><a href="#">all</a></li>
+                            {% if brand_name %}
+                            {% for brand in brand_name %}
+                             <li><a href="#" id="hrand">{{brand}}</a></li>
+                            {% endfor %}
+                            {% endif %}
+
+                               </ul>
+                                <!-- <ul id="select1">
                                     <li class="select-all selected"><a href="#">all  </a></li>
                                     <li><a href="#" id="hrand1">SIBOON</a></li>
                                     <li><a href="#" id="hrand2">沙洛尔</a></li> 
                                     <li><a href="#" id="hrand3">皮尔瑜伽</a></li>                             
-                                </ul>
+                                </ul> -->
                             </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="list-body select2">
-                            <div class="pull-left filter-left">材质：</div>
+                            <div class="pull-left filter-left">类   别：</div>
                             <div class="pull-right filter-right">
                                 <ul id="select2">
-                                <li class="select-all selected"><a href="#">all  </a></li>
-                                    <li><a href="#">加厚</a></li>
-                                     <li><a href="#">轻薄</a></li>
-                                     <li><a href="#">舒适</a></li>
-                                     <li><a href="#">柔软</a></li>
+                                <li class="select-all selected-2"><a href="#">all</a></li>
+                                     {% if type_list %}
+                                        {% for type1 in type_list %}
+                                        <li><a href="#" id="hrand">{{type1}}</a></li>
+                                        {% endfor %}
+                                        {% endif %}
                                 </ul>
                             </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="list-body select3">
-                            <div class="pull-left filter-left">类别：</div>
+                            <div class="pull-left filter-left">材   质：</div>
                             <div class="pull-right filter-right">
-                                <ul id="select3">
-                                <li class="select-all selected"><a href="#">all  </a></li>
-                                    <li><a href="#">运动</a></li>
-                                       <li><a href="#">内衣</a></li>
-                                          <li><a href="#">瑜伽服</a></li>
-                                </ul>
+                             <!--    <ul id="select3">
+                             <li class="select-all selected"><a href="#">all  </a></li>
+                                 <li><a href="#">运动</a></li>
+                                    <li><a href="#">内衣</a></li>
+                                       <li><a href="#">瑜伽服</a></li>
+                             </ul> -->
+                        <ul id="select3">
+                             <li class="select-all selected-3"><a href="#">all</a></li>
+                                     {% if feature_list %}
+                                        {% for feature1 in feature_list %}
+                                        <li><a href="#" id="hrand" >{{feature1}}</a></li>
+                                        {% endfor %}
+                                        {% endif %}                         
+                             </ul> 
                             </div>
                             <div class="clearfix"></div>
                         </div>
@@ -243,104 +231,21 @@
                     </div>
                     <div class="clearfix"></div>
                     <div class="pro-list-show">
-                        <ul>
-                            <li>
+                        <ul id='product-list'>
+                        {% if product_list %}
+                        {% for one in product_list %}
+                        <li>
                                 <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                    <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
+                                <img class="center-block" alt="" src="/res/{{ one.img }}"/></a>
+                                <div class="summary"><a href="/eweb/good/{{ one.id }}/">{{ one.name }}</a></div>
+                                <div class="price"><b>￥{{ one.price }}</b></div>
                                 <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
                                 <button type="button" class="btn btn-default btn-xs">加入购物车</button>
                             </li>
                          
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary" id='prduct1'><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button> 
-                            </li>
-                            <li>
-                                <a href="">
-                                    <img class="center-block" alt="" src="" /></a>
-                                <div class="summary"><a href="">商品名称</a></div>
-                                <div class="price"><b>￥00.00</b></div>
-                                <div class="list-show-eva"><i class="icon-main icon-eva-6"></i><a href="">北京有货</a></div>
-                                <button type="button" class="btn btn-default btn-xs">加入购物车</button>
-                            </li>
+                        {% endfor %}
+                        {% endif %}
+                         
                         </ul>
                     </div>
                 </div>
@@ -415,7 +320,7 @@
             </p>
         </div>
     </footer>
-    <script src="{% static 'lib/jquery/jquery-1.11.0.js' %}"></script>
-    <script src="{% static 'lib/bootstrap/js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/jquery-1.11.0.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
 </body>
 </html>

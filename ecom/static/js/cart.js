@@ -220,13 +220,3 @@ function DisplayCart(items){
   UpdateTotalPrice();
 }
 
-
-
-
-
-
-
-
-
-
-////

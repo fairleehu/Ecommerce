@@ -14,18 +14,21 @@ class Buyer(models.Model):
     '''
     buyer_id = models.AutoField(primary_key=True)
 
-    user = models.OneToOneField(User,verbose_name="用户名")
+    user = models.OneToOneField(User, verbose_name="用户名")
     gender = models.CharField(
         u'性别', choices=TITLE_CHOICES, max_length=10, null=True, blank=True)
-    register_time = models.DateTimeField(auto_now_add=True,verbose_name='注册时间')
-    real_name = models.CharField(max_length=20, blank=True,verbose_name='真实姓名')
-    province = models.CharField(max_length=20, blank=True,verbose_name='省')
-    city = models.CharField(max_length=20, blank=True,verbose_name='市')
-    town = models.CharField(max_length=20, blank=True,verbose_name='县')
-    addr = models.CharField(max_length=80, blank=True,verbose_name='地址')
+    register_time = models.DateTimeField(
+        auto_now_add=True, verbose_name='注册时间')
+    real_name = models.CharField(
+        max_length=20, blank=True, verbose_name='真实姓名')
+    province = models.CharField(max_length=20, blank=True, verbose_name='省')
+    city = models.CharField(max_length=20, blank=True, verbose_name='市')
+    town = models.CharField(max_length=20, blank=True, verbose_name='县')
+    addr = models.CharField(max_length=80, blank=True, verbose_name='地址')
 
     def __unicode__(self):
         return self.user.username
+
 
 class Brand(models.Model):
     '''
@@ -34,10 +37,10 @@ class Brand(models.Model):
     '''
     brand_id = models.AutoField(primary_key=True)
 
-    name = models.CharField(max_length=20,verbose_name='商品名称')
-    description = models.CharField(max_length=80,verbose_name='描述')
-    img_url = models.CharField(max_length=80,verbose_name='图片url')
-    is_display = models.BooleanField(default=True,verbose_name='是否可见')
+    name = models.CharField(max_length=20, verbose_name='商品名称')
+    description = models.CharField(max_length=80, verbose_name='描述')
+    img_url = models.CharField(max_length=80, verbose_name='图片url')
+    is_display = models.BooleanField(default=True, verbose_name='是否可见')
 
     def __unicode__(self):
         return self.name
@@ -50,10 +53,10 @@ class Producttype(models.Model):
     '''
     product_type_id = models.AutoField(primary_key=True)
 
-    name = models.CharField(max_length=20,verbose_name='用户名')
+    name = models.CharField(max_length=20, verbose_name='商品类型')
     parent_id = models.IntegerField(verbose_name='父商品类型id', null=True)
-    note = models.CharField(max_length=50,verbose_name='备注')
-    is_display = models.BooleanField(default=True,verbose_name='是否可见')
+    note = models.CharField(max_length=50, verbose_name='备注')
+    is_display = models.BooleanField(default=True, verbose_name='是否可见')
 
     def __unicode__(self):
         return self.name
@@ -66,8 +69,8 @@ class Productfeature(models.Model):
     '''
     product_feature_id = models.AutoField(primary_key=True)
 
-    name = models.CharField(max_length=20,verbose_name='商品属性')
-    is_del = models.BooleanField(default=True,verbose_name='是否废弃')
+    name = models.CharField(max_length=20, verbose_name='商品属性')
+    is_del = models.BooleanField(default=True, verbose_name='是否废弃')
 
     def __unicode__(self):
         return self.name
@@ -80,22 +83,23 @@ class Product(models.Model):
     是否热销(0,否 1:是),推荐(1推荐 0 不推荐),上下架(0否 1是),是否删除(0删除,1没删除),销量,商品描述(需要图片描述的路径),
     包装清单,商品属性集,颜色集,尺寸集,添加时间
     '''
-    product_id = models.IntegerField(primary_key=True,verbose_name='ID或商品编号')
-    producttype = models.ForeignKey(Producttype,verbose_name='类型ID')
-    brand = models.ForeignKey(Brand,verbose_name='品牌ID')
-    name = models.CharField(max_length=50,verbose_name='商品名称')
+    product_id = models.IntegerField(primary_key=True, verbose_name='ID或商品编号')
+    producttype = models.ForeignKey(Producttype, verbose_name='类型ID')
+    brand = models.ForeignKey(Brand, verbose_name='品牌ID')
+    name = models.CharField(max_length=50, verbose_name='商品名称')
     weight = models.FloatField(verbose_name='重量（克）')
-    is_new = models.BooleanField(default=True,verbose_name='是否新品')
-    is_hot = models.BooleanField(default=True,verbose_name='是否热销')
-    is_commend = models.BooleanField(default=False,verbose_name='推荐')
-    is_show = models.BooleanField(default=False,verbose_name='上下架')
-    is_del = models.BooleanField(default=True,verbose_name='是否删除')
-    description = models.ImageField(upload_to='productimages', blank=False,verbose_name='商品描述')
-    package_list = models.CharField(max_length=100,verbose_name='包装清单')
+    is_new = models.BooleanField(default=True, verbose_name='是否新品')
+    is_hot = models.BooleanField(default=True, verbose_name='是否热销')
+    is_commend = models.BooleanField(default=False, verbose_name='推荐')
+    is_show = models.BooleanField(default=False, verbose_name='上下架')
+    is_del = models.BooleanField(default=True, verbose_name='是否删除')
+    description = models.ImageField(
+        upload_to='productimages', blank=False, verbose_name='商品描述')
+    package_list = models.CharField(max_length=100, verbose_name='包装清单')
 
-    features = models.CharField(max_length=100,verbose_name='商品属性集')
-    colors = models.CharField(max_length=100,verbose_name='颜色集')
-    sizes = models.CharField(max_length=100,verbose_name='尺寸集')
+    features = models.ForeignKey(Productfeature,verbose_name='商品属性')
+    colors = models.CharField(max_length=100, verbose_name='颜色集')
+    sizes = models.CharField(max_length=100, verbose_name='尺寸集')
 
     create_time = models.DateTimeField(verbose_name='添加时间')
 
@@ -109,9 +113,10 @@ class Img(models.Model):
     商品ID,图片url
     是否默认 0否 1是
     '''
-    product = models.ForeignKey(Product,verbose_name='商品')
-    url = models.ImageField(upload_to='productimages', blank=False,verbose_name='图片Url')
-    is_def = models.BooleanField(default=False,verbose_name='是否默认')
+    product = models.ForeignKey(Product, verbose_name='商品')
+    url = models.ImageField(upload_to='productimages',
+                            blank=False, verbose_name='图片Url')
+    is_def = models.BooleanField(default=False, verbose_name='是否默认')
 
     def __unicode__(self):
         return self.product.name
@@ -124,7 +129,7 @@ class Color(models.Model):
     '''
     color_id = models.AutoField(primary_key=True)
 
-    color = models.CharField(max_length=20,verbose_name='商品颜色')
+    color = models.CharField(max_length=20, verbose_name='商品颜色')
     parent_id = models.IntegerField(verbose_name='颜色父ID', null=True)
 
     def __unicode__(self):
@@ -141,15 +146,16 @@ class Sku(models.Model):
     '''
     sku_id = models.AutoField(primary_key=True)
 
-    product = models.ForeignKey(Product,verbose_name='商品')
-    color = models.ForeignKey(Color,verbose_name='颜色')
-    sizes = models.CharField(max_length=5,verbose_name='尺码')
-    delive_fee = models.IntegerField(default=10,verbose_name='运费')
+    product = models.ForeignKey(Product, verbose_name='商品')
+    color = models.ForeignKey(Color, verbose_name='颜色')
+    sizes = models.CharField(max_length=5, verbose_name='尺码')
+    delive_fee = models.IntegerField(default=10, verbose_name='运费')
     price = models.FloatField(verbose_name='售价')
     stock = models.IntegerField(verbose_name='库存')
-    location = models.CharField(max_length=50,verbose_name='仓库位置:货架号')
+    location = models.CharField(max_length=50, verbose_name='仓库位置:货架号')
 
-    sku_img = models.ImageField(upload_to='productimages',verbose_name='SKU图片')
+    sku_img = models.ImageField(
+        upload_to='productimages', verbose_name='SKU图片')
 
     sku_status = models.BooleanField(default=False)
     sku_type = models.BooleanField(default=True)
@@ -175,20 +181,21 @@ class Order(models.Model):
     '附言',
     '用户名',
     '''
-    order_id = models.IntegerField(primary_key=True,verbose_name='订单ID')
+    order_id = models.IntegerField(primary_key=True, verbose_name='订单ID')
 
     deliver_fee = models.IntegerField(verbose_name='运费')
     total_fee = models.FloatField(verbose_name='应付金额')
     order_price = models.FloatField(verbose_name='订单金额')
-    payment_way = models.CharField(max_length=10,verbose_name='支付方式')
-    payment_cash = models.CharField(max_length=10,verbose_name='货到付款方式')
-    delivery = models.DateField(auto_now_add=True,verbose_name='送货时间')
-    is_confirm = models.CharField(max_length=10,verbose_name='是否电话确认')
-    is_pay = models.CharField(max_length=10,verbose_name='支付状态')
-    order_state = models.CharField(max_length=10,verbose_name='订单状态')
-    create_date = models.DateTimeField(auto_now_add=True,verbose_name='订单生成时间')
-    note = models.CharField(max_length=100,verbose_name='附言', null=True)
-    buyer = models.ForeignKey(Buyer,verbose_name='用户名')
+    payment_way = models.CharField(max_length=10, verbose_name='支付方式')
+    payment_cash = models.CharField(max_length=10, verbose_name='货到付款方式')
+    delivery = models.DateField(auto_now_add=True, verbose_name='送货时间')
+    is_confirm = models.CharField(max_length=10, verbose_name='是否电话确认')
+    is_pay = models.CharField(max_length=10, verbose_name='支付状态')
+    order_state = models.CharField(max_length=10, verbose_name='订单状态')
+    create_date = models.DateTimeField(
+        auto_now_add=True, verbose_name='订单生成时间')
+    note = models.CharField(max_length=100, verbose_name='附言', null=True)
+    buyer = models.ForeignKey(Buyer, verbose_name='用户名')
 
     def __unicode__(self):
         return self.buyer.user.username
@@ -201,13 +208,13 @@ class Orderdetail(models.Model):
     '''
     order_detail_id = models.AutoField(primary_key=True)
 
-    order = models.ForeignKey(Order,verbose_name='订单')
+    order = models.ForeignKey(Order, verbose_name='订单')
     product_id = models.IntegerField(verbose_name='商品编号')
-    product_name = models.CharField(max_length=80,verbose_name='商品名称')
-    color = models.CharField(max_length=5,verbose_name='颜色名称')
-    size = models.CharField(max_length=5,verbose_name='尺码')
+    product_name = models.CharField(max_length=80, verbose_name='商品名称')
+    color = models.CharField(max_length=5, verbose_name='颜色名称')
+    size = models.CharField(max_length=5, verbose_name='尺码')
     price = models.FloatField(verbose_name='商品销售价')
-    amount = models.IntegerField(default=1,verbose_name='购买数量')
+    amount = models.IntegerField(default=1, verbose_name='购买数量')
 
     def __unicode__(self):
         return self.product_name

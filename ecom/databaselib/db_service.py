@@ -6,7 +6,6 @@ import time
 from eweb.models import *
 
 
-
 """
 包含了对数据库的Server层的操作
 封装应用层了对数据库的所有业务上的操作
@@ -15,7 +14,9 @@ from eweb.models import *
 
 Redis = db_base.RedisBase()
 
-ITEM_UPDATETIME_MINNUMBER = 60*60*24
+ITEM_UPDATETIME_MINNUMBER = 60 * 60 * 24
+
+
 def NeedUpdateAddTime(itemOldTime):
     delta_time = long(time.time() - itemOldTime)
     if delta_time >= ITEM_UPDATETIME_MINNUMBER:
@@ -26,87 +27,96 @@ def NeedUpdateAddTime(itemOldTime):
 """
 购物车的操作
 """
+
+
 def ModifyItemInDBCart(username, item):
     """
     用来修改数据库中的Cart，如果商品数量小于等于0会删除商品
     item为一个(itemID,number)的元组
     """
-    cartItemCountKey = "CartIC:"+username
-    cartAddTimeKey = "CartAT:"+username
+    cartItemCountKey = "CartIC:" + username
+    cartAddTimeKey = "CartAT:" + username
     ret = Redis.Hincrby(cartItemCountKey, item[0], item[1])
     if ret <= 0:
         Redis.Hdel(cartItemCountKey, item[0])
         Redis.Hdel(cartAddTimeKey, item[0])
     else:
         itemOldTime = Redis.Hget(cartAddTimeKey, item[0])
-        if itemOldTime == None or NeedUpdateAddTime(itemOldTime):
-            Redis.Hset(cartAddTimeKey, item[0], int(time.time()))
+        if itemOldTime == None or NeedUpdateAddTime(long(itemOldTime)):
+            Redis.Hset(cartAddTimeKey, item[0], long(time.time()))
     return
+
 
 def SetItemInDBCart(username, item):
     """
     用来修改数据库中的Cart，如果商品数量小于等于0会删除商品
     """
-    #商品加入的数量
-    cartItemCountKey = "CartIC:"+username
-    #商品加入的时间，用于前端排序
-    cartAddTimeKey = "CartAT:"+username
+    # 商品加入的数量
+    cartItemCountKey = "CartIC:" + username
+    # 商品加入的时间，用于前端排序
+    cartAddTimeKey = "CartAT:" + username
     if item[1] <= 0:
         Redis.Hdel(cartItemCountKey, item[0])
         Redis.Hdel(cartAddTimeKey, item[0])
     else:
         Redis.Hset(cartItemCountKey, item[0], item[1])
         itemOldTime = Redis.Hget(cartAddTimeKey, item[0])
-        #更新商品加入的时间
+        # 更新商品加入的时间
         if itemOldTime == None or NeedUpdateAddTime(long(itemOldTime)):
             Redis.Hset(cartAddTimeKey, item[0], long(time.time()))
     return
+
 
 def GetItemsCountInCart(username):
     """
     返回购物车中所有的商品，以字典的形式
     """
-    cartItemCountKey = "CartIC:"+username
+    cartItemCountKey = "CartIC:" + username
     itemDict = Redis.Hgetall(cartItemCountKey)
     return itemDict
+
 
 def GetItemsAddTimeInCart(username):
     """
     返回购物车商品添加的时间
     """
-    cartAddTimeKey = "CartAT:"+username
+    cartAddTimeKey = "CartAT:" + username
     itemDict = Redis.Hgetall(cartAddTimeKey)
     return itemDict
 
-TEMPORDER_LIFETIME = 60*60*5
+TEMPORDER_LIFETIME = 60 * 60 * 5
+
+
 def CreateTempOrder(username, tempOrder):
     """
     用于存储临时订单的信息
     """
     if len(tempOrder) == 0:
         return False
-    tempOrderKey = "TempOrder:"+username
+    tempOrderKey = "TempOrder:" + username
     if Redis.Exists(tempOrderKey) is True:
         Redis.Delete(tempOrderKey)
     Redis.Sadd(tempOrderKey, *tempOrder)
     return True
 
+
 def GetTempOrder(username):
     """
     返回临时的订单信息[(id1, count1, addtime1),(id2, count2, addtime2)......]
     """
-    tempOrderKey = "TempOrder:"+username
+    tempOrderKey = "TempOrder:" + username
     if Redis.Exists(tempOrderKey) is False:
         return []
     items = list(Redis.Smembers(tempOrderKey))
-    cartItemCountKey = "CartIC:"+username
+    cartItemCountKey = "CartIC:" + username
     counts = Redis.Hmget(cartItemCountKey, items)
-    cartAddTimeKey = "CartAT:"+username
+    cartAddTimeKey = "CartAT:" + username
     addTime = Redis.Hmget(cartAddTimeKey, items)
     tempOrder = []
     for i in range(len(items)):
         tempOrder.append((items[i], counts[i], addTime[i]))
     return tempOrder
+
 
 def IncInventoryStock(inventid, count):
     """
@@ -119,15 +129,17 @@ def IncInventoryStock(inventid, count):
     remain = Redis.Hincrby(inventoryKey, "Stock", count)
     return remain
 
+
 def CheckInventoryStock(inventid, count):
     UpdateInventoryInCache(inventid)
     inventoryKey = "InvInfo:" + str(inventid)
     if Redis.Exists(inventoryKey) is False:
         return False
     stock = Redis.Hget(inventoryKey, "Stock")
-    if int(stock) < int (count):
+    if int(stock) < int(count):
         return False
     return True
+
 
 def ChangeStock(items):
     """
@@ -138,57 +150,61 @@ def ChangeStock(items):
     """
     successList = []
     Success = True
-    #执行一次预判断，预判断不执行写操作，用来减少写操作失败的情况
+    # 执行一次预判断，预判断不执行写操作，用来减少写操作失败的情况
     for item in items:
         if CheckInventoryStock(item[0], item[1]) is False:
             return False
-    #对redis中的库存数进行写操作，如果写操作出现<0的情况，那么进行回滚
+    # 对redis中的库存数进行写操作，如果写操作出现<0的情况，那么进行回滚
     for item in items:
         remain = IncInventoryStock(item[0], - int(item[1]))
         if remain != None:
             successList.append((item[0], int(item[1])))
         if (remain == None) or (remain < 0):
-            #向日志中打印，方便统计实验
+            # 向日志中打印，方便统计实验
             print "Dirty Write in CheckStock: remain = " + str(remain)
             Success = False
-            break;
+            break
     if Success == False:
-        #执行回滚操作
+        # 执行回滚操作
         for item in successList:
             IncInventoryStock(item[0], item[1])
         return False
     else:
         return True
 
-#TODO   并没有加入订单的其它信息，
+# TODO   并没有加入订单的其它信息，
+
+
 def CreateUnpayedOrder(username, items):
     """
     生成一个未完成支付的订单
     """
-    #产生Order内容
+    # 产生Order内容
     Order = {}
     for item in items:
         Order[item[0]] = item[1]
-    #生成新unpaiedOrderId
+    # 生成新unpaiedOrderId
     unpaiedOrderId = ''.join(str(uuid.uuid1()).split('-'))
-    #加入order清单的购物内容
-    unpaiedOrderItemsKey = "UnpaiedOrderItems:"+unpaiedOrderId
+    # 加入order清单的购物内容
+    unpaiedOrderItemsKey = "UnpaiedOrderItems:" + unpaiedOrderId
     Redis.Hmset(unpaiedOrderItemsKey, Order)
-    #加入到用户的order列表中
-    userUnpaiedOrderListKey = "UnpaiedOrderList:"+username
+    # 加入到用户的order列表中
+    userUnpaiedOrderListKey = "UnpaiedOrderList:" + username
     Redis.Lpush(userUnpaiedOrderListKey, unpaiedOrderId)
-    #删除临时的order
-    tempOrderKey = "TempOrder:"+username
+    # 删除临时的order
+    tempOrderKey = "TempOrder:" + username
     Redis.Delete(tempOrderKey)
-    #TODO 将零时的Oder加入到清理列表，可以实现倒计时付款的功能
-    #清理要靠守护进程来实现
+    # TODO 将零时的Oder加入到清理列表，可以实现倒计时付款的功能
+    # 清理要靠守护进程来实现
     return True
 
 """
 数据库表的缓存操作
 """
 #from eweb.models import Product
-PROD_INFO_LIFETIME = 60*60*5
+PROD_INFO_LIFETIME = 60 * 60 * 5
+
+
 def UpdateProductInCache(productid):
     """
     用于在redis中缓存Product表
@@ -212,37 +228,38 @@ def UpdateProductInCache(productid):
     prodInfoKey = "ProdInfo:" + str(productid)
     if Redis.Expire(prodInfoKey, PROD_INFO_LIFETIME) is True:
         return True
-    #不存在
+    # 不存在
     try:
-        product = Product.objects.get(product_id = productid)
+        product = Product.objects.get(product_id=productid)
     except Exception, e:
         print e
         return False
 
-    ret = Redis.Hmset(prodInfoKey,{
-            "ProdTypeId":product.producttype.product_type_id,       #类型ID
-            "BrandID":product.brand.brand_id,         #品牌ID
-            "Name":product.name,                #商品名称
-            "Weight":product.weight,            #重量
-            "Package":product.package_list,     #商品内的物品清单
-            "New":product.is_new,               #新品
-            "Hot":product.is_hot,               #热销
-            "Commend":product.is_commend,       #推荐
-            "DescImage":product.description,    #商品描述图片
-            "Features":product.features,        #商品的参数集
-            "Colors":product.colors,            #商品的颜色集
-            "Sizes":product.sizes,              #商品的尺寸集
-            "CreateTime":product.create_time,   #创建时间
-            })
+    ret = Redis.Hmset(prodInfoKey, {
+        "ProdTypeId": product.producttype.product_type_id,  # 类型ID
+        "BrandID": product.brand.brand_id,  # 品牌ID
+        "Name": product.name,  # 商品名称
+        "Weight": product.weight,  # 重量
+        "Package": product.package_list,  # 商品内的物品清单
+        "New": product.is_new,  # 新品
+        "Hot": product.is_hot,  # 热销
+        "Commend": product.is_commend,  # 推荐
+        "DescImage": product.description,  # 商品描述图片
+        "Features": product.features.product_feature_id,  # 商品的参数集
+        "Colors": product.colors,  # 商品的颜色集
+        "Sizes": product.sizes,  # 商品的尺寸集
+        "CreateTime": product.create_time,  # 创建时间
+    })
 
     if ret == False:
         print "Redis Hmset product error"
         return False
     Redis.Expire(prodInfoKey, PROD_INFO_LIFETIME)
-    #刷新商品的库存集合
+    # 刷新商品的库存集合
     __UpdateProductInventorySetInCache(product)
 
     return True
+
 
 def GetProductInfo(productid, *keys):
     """
@@ -262,7 +279,9 @@ def GetProductInfo(productid, *keys):
 
 
 #from eweb.models import Brand
-BRAND_INFO_LIFETIME = 60*60*24
+BRAND_INFO_LIFETIME = 60 * 60 * 24
+
+
 def UpdateBrandInfoInCache(brandid):
     """
     缓存品牌表
@@ -273,22 +292,22 @@ def UpdateBrandInfoInCache(brandid):
         "Display":is_display,       #是否会显示在筛选选项中
     }
     """
-    brandInfoKey = "BrandInfo:"+brandid
+    brandInfoKey = "BrandInfo:" + brandid
     if Redis.Expire(brandInfoKey, BRAND_INFO_LIFETIME) is True:
         return True
 
     try:
-        brand = Brand.objects.get(brand_id = brandid)
+        brand = Brand.objects.get(brand_id=brandid)
     except Exception, e:
         print e
         return False
 
-    ret = Redis.Hmset(brandInfoKey,{
-            "Name":brand.name,           #品牌名称
-            "Desc":brand.description,         #品牌描述
-            "LogoUrl":brand.img_url,          #商标图片路径
-            "Display":int(brand.is_display),       #是否会显示在筛选选项中
-            })
+    ret = Redis.Hmset(brandInfoKey, {
+        "Name": brand.name,  # 品牌名称
+        "Desc": brand.description,  # 品牌描述
+        "LogoUrl": brand.img_url,  # 商标图片路径
+        "Display": int(brand.is_display),  # 是否会显示在筛选选项中
+    })
 
     if ret == False:
         print "Redis Hmset BrandInfo error"
@@ -297,13 +316,14 @@ def UpdateBrandInfoInCache(brandid):
 
     return True
 
+
 def GetBrandInfo(brandid, *keys):
     """
     获得品牌的信息
     返回字典
     """
     result_dict = {}
-    brandInfoKey = "BrandInfo:"+brandid
+    brandInfoKey = "BrandInfo:" + brandid
     if Redis.Exists(brandInfoKey) is False:
         if UpdateBrandInfoInCache(brandid) is False:
             print "update " + brandInfoKey + " error"
@@ -314,6 +334,8 @@ def GetBrandInfo(brandid, *keys):
     return result_dict
 
 ALL_BRANDID_LIFETIME = 60
+
+
 def UpdateAllBrandIDInCache():
     """
 
@@ -322,7 +344,8 @@ def UpdateAllBrandIDInCache():
     if Redis.Exists(allBrandIDKey) is True:
         return True
     try:
-        brandIDList = Brand.objects.filter(is_display=1).values_list('brand_id', flat=True)
+        brandIDList = Brand.objects.filter(
+            is_display=1).values_list('brand_id', flat=True)
     except Exception, e:
         print e
         return False
@@ -335,6 +358,7 @@ def UpdateAllBrandIDInCache():
         return False
     Redis.Expire(allBrandIDKey, ALL_BRANDID_LIFETIME)
     return True
+
 
 def GetAllBrandID():
     """
@@ -350,6 +374,7 @@ def GetAllBrandID():
     result_list = list(values)
     return result_list
 
+
 def GetAllBrandName():
     """
     获得所有品牌ID和品牌名的字典集
@@ -363,7 +388,9 @@ def GetAllBrandName():
     return result_dict
 
 #from eweb.models import Producttype
-PRODUCTTYPE_INFO_LIFETIME = 60*60*24
+PRODUCTTYPE_INFO_LIFETIME = 60 * 60 * 24
+
+
 def UpdateProductTypeInfoInCache(prodtypeid):
     """
     缓存商品类型表
@@ -379,23 +406,24 @@ def UpdateProductTypeInfoInCache(prodtypeid):
         return True
 
     try:
-        prodtype = Producttype.objects.get(product_type_id = prodtypeid)
+        prodtype = Producttype.objects.get(product_type_id=prodtypeid)
     except Exception, e:
         print e
         return False
 
-    ret = Redis.Hmset(prodtypeInfoKey,{
-            "Name":prodtype.name,                #类型名称
-            "FatherTypeId":prodtype.parent_id,   #父商品类型ID
-            "Note":prodtype.note,                #备注(用于搜索页面商品描述)
-            "Display":int(prodtype.is_display),       #是否在搜索时可见
-            })
+    ret = Redis.Hmset(prodtypeInfoKey, {
+        "Name": prodtype.name,  # 类型名称
+        "FatherTypeId": prodtype.parent_id,  # 父商品类型ID
+        "Note": prodtype.note,  # 备注(用于搜索页面商品描述)
+        "Display": int(prodtype.is_display),  # 是否在搜索时可见
+    })
 
     if ret == False:
         print "Redis Hmset prodtype error"
         return False
     Redis.Expire(prodtypeInfoKey, PRODUCTTYPE_INFO_LIFETIME)
     return True
+
 
 def GetProductTypeInfo(prodtypeid, *keys):
     """
@@ -414,6 +442,8 @@ def GetProductTypeInfo(prodtypeid, *keys):
     return result_dict
 
 ALL_PRODTYPEID_LIFETIME = 60
+
+
 def UpdateAllProdTypeIDInCache():
     """
 
@@ -422,7 +452,8 @@ def UpdateAllProdTypeIDInCache():
     if Redis.Exists(allProdTypeIDKey) is True:
         return True
     try:
-        allProdIDList = Producttype.objects.filter(is_display=1).values_list('product_type_id', flat=True)
+        allProdIDList = Producttype.objects.filter(
+            is_display=1).values_list('product_type_id', flat=True)
     except Exception, e:
         print e
         return False
@@ -435,6 +466,7 @@ def UpdateAllProdTypeIDInCache():
         return False
     Redis.Expire(allProdTypeIDKey, ALL_PRODTYPEID_LIFETIME)
     return True
+
 
 def GetAllProdTypeID():
     """
@@ -450,6 +482,7 @@ def GetAllProdTypeID():
     result_list = list(values)
     return result_list
 
+
 def GetAllProdTypeName():
     """
     获得所有类型ID和类型名的字典集
@@ -459,11 +492,14 @@ def GetAllProdTypeName():
     IDList = GetAllProdTypeID()
     result_dict = {}
     for prodtypeid in IDList:
-        result_dict[prodtypeid] = GetProductTypeInfo(prodtypeid, "Name").get("Name")
+        result_dict[prodtypeid] = GetProductTypeInfo(
+            prodtypeid, "Name").get("Name")
     return result_dict
 
 #from eweb.models import Productfeature
-FEATURE_INFO_LIFETIME = 60*60*24
+FEATURE_INFO_LIFETIME = 60 * 60 * 24
+
+
 def UpdateFeatureInfoInCache(featureid):
     """
     缓存商品属性表
@@ -478,21 +514,22 @@ def UpdateFeatureInfoInCache(featureid):
         return True
 
     try:
-        feature = Productfeature.objects.get(product_feature_id = featureid)
+        feature = Productfeature.objects.get(product_feature_id=featureid)
     except Exception, e:
         print e
         return False
 
-    ret = Redis.Hmset(featureInfoKey,{
-            "Name":feature.name,                #类型名称
-            "Del":int(feature.is_del),       #是否在搜索时可见
-            })
+    ret = Redis.Hmset(featureInfoKey, {
+        "Name": feature.name,  # 类型名称
+        "Del": int(feature.is_del),  # 是否在搜索时可见
+    })
 
     if ret == False:
         print "Redis Hmset feature error"
         return False
     Redis.Expire(featureInfoKey, FEATURE_INFO_LIFETIME)
     return True
+
 
 def GetFeatureInfo(featureid, *keys):
     """
@@ -511,6 +548,8 @@ def GetFeatureInfo(featureid, *keys):
     return result_dict
 
 ALL_PRODFEATUREID_LIFETIME = 60
+
+
 def UpdateAllFeatureIDInCache():
     """
 
@@ -519,7 +558,8 @@ def UpdateAllFeatureIDInCache():
     if Redis.Exists(allFeatureIDKey) is True:
         return True
     try:
-        allFeatureIDList = Productfeature.objects.filter(is_del=0).values_list('product_feature_id', flat=True)
+        allFeatureIDList = Productfeature.objects.filter(
+            is_del=0).values_list('product_feature_id', flat=True)
     except Exception, e:
         print e
         return False
@@ -548,6 +588,7 @@ def GetAllFeatureID():
     result_list = list(values)
     return result_list
 
+
 def GetAllFeatureName():
     """
     获得所有属性ID和属性名的字典集
@@ -561,18 +602,21 @@ def GetAllFeatureName():
     return result_dict
 
 #from eweb.models import Img
-PROD_IMGS_LIFETIME = 60*60*5
+PROD_IMGS_LIFETIME = 60 * 60 * 5
+
+
 def UpdateProductImageSetInCache(productid):
     """
     用于记录一个商品的图片集
     ProdImgSet:pid[]
     """
     try:
-        product = Product.objects.get(product_id = productid)
+        product = Product.objects.get(product_id=productid)
     except Exception, e:
         print e
         return False
     return __UpdateProductImageSetInCache(product, productid)
+
 
 def __UpdateProductImageSetInCache(product, productid=None):
     """
@@ -595,6 +639,7 @@ def __UpdateProductImageSetInCache(product, productid=None):
     Redis.Expire(prodImgSetKey, PROD_IMGS_LIFETIME)
     return True
 
+
 def GetProductImage(productid):
     """
     获得一个商品的所有图片
@@ -611,19 +656,22 @@ def GetProductImage(productid):
 
 
 #from eweb.models import Sku
-PROD_INVENT_LIFETIME = 60*60*5
+PROD_INVENT_LIFETIME = 60 * 60 * 5
+
+
 def UpdateProductInventorySetInCache(productid):
     """
     用于记录一个商品的库存
     ProdInvSet:pid[]
     """
     try:
-        product = Product.objects.get(product_id = productid)
+        product = Product.objects.get(product_id=productid)
     except Exception, e:
         print e
         return False
 
     return __UpdateProductInventorySetInCache(product, productid)
+
 
 def __UpdateProductInventorySetInCache(product, productid=None):
     """
@@ -636,7 +684,8 @@ def __UpdateProductInventorySetInCache(product, productid=None):
     if Redis.Expire(prodInvSetKey, PROD_INVENT_LIFETIME) is True:
         return True
 
-    inventList = Sku.objects.filter(product=product).values_list('sku_id', flat=True)
+    inventList = Sku.objects.filter(
+        product=product).values_list('sku_id', flat=True)
     if len(inventList) == 0:
         return True
     ret = Redis.Sadd(prodInvSetKey, *inventList)
@@ -645,6 +694,7 @@ def __UpdateProductInventorySetInCache(product, productid=None):
         return False
     Redis.Expire(prodInvSetKey, PROD_INVENT_LIFETIME)
     return True
+
 
 def GetProductInventory(productid):
     """
@@ -661,7 +711,9 @@ def GetProductInventory(productid):
     return result_list
 
 #from eweb.models import Sku
-INVENTORY_LIFETIME = 60*60*5
+INVENTORY_LIFETIME = 60 * 60 * 5
+
+
 def UpdateInventoryInCache(inventoryid):
     """
     用于在redis中缓存库存信息
@@ -685,30 +737,31 @@ def UpdateInventoryInCache(inventoryid):
         return True
 
     try:
-        inventory = Sku.objects.get(sku_id = inventoryid)
+        inventory = Sku.objects.get(sku_id=inventoryid)
     except Exception, e:
         print e
         return False
 
-    ret = Redis.Hmset(inventoryKey,{
-            "ProdectID":inventory.product.product_id,     #商品ID
-            "Color":inventory.color.color,          #颜色ID
-            "Size":inventory.sizes,               #尺码
-            "DeliveFee":inventory.delive_fee,     #运费
-            "Price":inventory.price,              #售价
-            "Stock":inventory.stock,              #销量
-            "Location":inventory.location,        #货架号
-            "InvImg":inventory.sku_img,           #库存照片
-            "InvStatus":inventory.sku_status,     #是历史库存还是新品
-            "InvType":inventory.sku_type,         #是赠品还是普通
-            "Sales":inventory.sales,              #历史销量
-            })
+    ret = Redis.Hmset(inventoryKey, {
+        "ProdectID": inventory.product.product_id,  # 商品ID
+        "Color": inventory.color.color,  # 颜色ID
+        "Size": inventory.sizes,  # 尺码
+        "DeliveFee": inventory.delive_fee,  # 运费
+        "Price": inventory.price,  # 售价
+        "Stock": inventory.stock,  # 库存量
+        "Location": inventory.location,  # 货架号
+        "InvImg": inventory.sku_img,  # 库存照片
+        "InvStatus": inventory.sku_status,  # 是历史库存还是新品
+        "InvType": inventory.sku_type,  # 是赠品还是普通
+        "Sales": inventory.sales,  # 历史销量
+    })
 
     if ret == False:
         print "Redis Hmset inventory error"
         return False
     Redis.Expire(inventoryKey, INVENTORY_LIFETIME)
     return True
+
 
 def GetInventorInfo(inventid, *keys):
     """
@@ -727,7 +780,9 @@ def GetInventorInfo(inventid, *keys):
     return result_dict
 
 #from eweb.models import Buyer
-USER_INFO_LIFETIME = 60*60*3
+USER_INFO_LIFETIME = 60 * 60 * 3
+
+
 def UpdateUserInCache(user):
     """
     在redis中缓存用户信息
@@ -759,16 +814,16 @@ def UpdateUserInCache(user):
         print e
         return False
 
-    ret = Redis.Hmset(userinfoKey,{
-            "Email":userinfo.user.email,
-            "Gender":userinfo.gender,
-            "RegTime":userinfo.register_time,
-            "RealName":userinfo.real_name,
-            "Province":userinfo.province,
-            "City":userinfo.city,
-            "Town":userinfo.town,
-            "Addr":userinfo.addr,
-            })
+    ret = Redis.Hmset(userinfoKey, {
+        "Email": userinfo.user.email,
+        "Gender": userinfo.gender,
+        "RegTime": userinfo.register_time,
+        "RealName": userinfo.real_name,
+        "Province": userinfo.province,
+        "City": userinfo.city,
+        "Town": userinfo.town,
+        "Addr": userinfo.addr,
+    })
 
     if ret == False:
         print "Redis Hmset userinfo error"
@@ -776,6 +831,7 @@ def UpdateUserInCache(user):
 
     Redis.Expire(userinfoKey, USER_INFO_LIFETIME)
     return True
+
 
 def GetUserInfo(user, *keys):
     """
@@ -801,7 +857,9 @@ def GetUserInfo(user, *keys):
 """
 清空缓存中的数据，给后台管理提供的接口
 """
-#TODO
+# TODO
+
+
 def DeleteProductFromCache(*productids):
     prodInfoKeys = []
     for productid in productids:

@@ -13,7 +13,7 @@ def GetItemList(request):
     itemlist = {}
     items = []
     login_statue = request.user.is_authenticated()
-
+    # print login_statue
     if login_statue == True:
         username = request.user.get_username()
         # 如果登录，对redis中的shoppingCart进行操作
@@ -33,6 +33,7 @@ def GetItemList(request):
                     item = (key, offlineCart[key], int(time.time()))
                     items.append(item)
 
+            # print "shoppingCart" + str(request.session.get('shoppingCart'))
     # TEST TODO
     #items = [(1, 3, int(time.time())-12), (2, 5, int(time.time()))]
     return items
@@ -43,6 +44,7 @@ def ModifyItemsInCart(request, *items):
     用来增减商品的数量,如果商品数量小于等于0会删除商品
     """
     login_statue = request.user.is_authenticated()
+    # print login_statue
     if login_statue == True:
         username = request.user.get_username()
         # 如果登录，对redis中的shoppingCart进行操作
@@ -51,10 +53,18 @@ def ModifyItemsInCart(request, *items):
     else:
         # 如果没有登录，对cookie进行操作
         offlineCart = request.session.get('shoppingCart')
+        if offlineCart == None:
+            offlineCart = {}
+
         for item in items:
-            offlineCart[item[0]] += item[1]
+            count = offlineCart.get(item[0])
+            if count == None:
+                count = 0
+            offlineCart[item[0]] = int(count) + int(item[1])
             if offlineCart[item[0]] <= 0:
                 del offlineCart[item[0]]
+        request.session['shoppingCart'] = offlineCart
+        # print "shoppingCart" + str(request.session.get('shoppingCart'))
     return True
 
 
@@ -63,16 +73,24 @@ def SetItemsInCart(request, *items):
     用来设置商品的数量，如果商品数量小于等于0会删除商品
     """
     login_statue = request.user.is_authenticated()
+    # print login_statue
     if login_statue == True:
         username = request.user.get_username()
         for item in items:
             db_service.SetItemInDBCart(username, item)
     else:
         offlineCart = request.session.get('shoppingCart')
+        if offlineCart == None:
+            request.session['shoppingCart'] = {}
+            offlineCart = request.session.get('shoppingCart')
+
         for item in items:
-            offlineCart[item[0]] = item[1]
+            offlineCart[item[0]] = int(item[1])
             if offlineCart[item[0]] < 0:
                 del offlineCart[item[0]]
+
+        request.session['shoppingCart'] = offlineCart
+        # print "shoppingCart" + str(request.session.get('shoppingCart'))
     return True
 
 
@@ -81,7 +99,7 @@ def GenerateTempOrder(request, *itemlist):
     items = []
     Check = True
     for item in itemlist:
-        print item
+        # print item
         items.append((item["ID"], int(item["COUNT"])))
         if int(item["COUNT"]) > 0:
             tempOrder.append(item["ID"])

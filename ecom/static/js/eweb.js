@@ -91,23 +91,23 @@ $(document).ready(function() {
       } 
     } 
   });
-  $("#selectA").live("click", 
+  $("#selectA").on("click", 
   function() { 
     $(this).remove(); 
     $("#select1 .select-all").addClass("selected").siblings().removeClass("selected"); 
   }); 
-  $("#selectB").live("click", 
+  $("#selectB").on("click", 
   function() { 
     $(this).remove(); 
     $("#select2  .select-all ").addClass("selected").siblings().removeClass("selected"); 
   }); 
-    $("#selectC").live("click", 
+    $("#selectC").on("click", 
   function() { 
     $(this).remove(); 
     $("#select3 .select-all").addClass("selected").siblings().removeClass("selected"); 
   }); 
 
-$(".item-filter li").live("click", 
+$(".item-filter li").on("click", 
     function () { 
         if ($(".alert-sm b ").length > 1) { 
             $(".select-no").hide(); 
